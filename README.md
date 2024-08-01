@@ -358,20 +358,27 @@ const main = async () => {
 };
 ```
 
-### Change stream performance
+### Change Stream performance
 
 If the number of active change streams on a database surpasses the connection pool size,
 you might encounter delays in notifications.
 Each change stream occupies a connection and continuously performs a getMore operation while waiting for the next event. To prevent latency issues, ensure that the connection pool size exceeds the number of active change streams. For more information, refer to the maxPoolSize setting.
 
-### Change stream resume
+### Change Stream resume
 Each change stream event document includes a resume token, which the Node.js driver automatically stores in the _id field of the change event document. When creating a new change stream, the application can pass this resume token to ensure the stream includes all events that occurred after the event associated with that token.
 
 The MongoDB Node.js driver will try to reestablish connections automatically during transient network errors or elections, using its cached copy of the most recent resume token to avoid losing any change stream events.
 However, if the application fails or restarts, it needs to provide the resume token when creating a new change stream to ensure no events are missed.
 Note that the driver's cached copy of the resume token is lost when the application restarts, so the application should store the resume token itself.
 
-### Change stream with aggregation
+### Change Stream Enchancer (Java)
+
+gravity9 created a library that helps manage MongoDB Change Streams. So far, only Java version is avaiable. Mongo Change Stream Enhancer divides Change Stream events into partitions and enables you to handle them in separate Threads, increasing throughput. It achieves that by creating a Change Stream per each partition (number is configurable) and handling each Change Stream in a dedicated Thread.
+
+
+[Change Stream Enchancer (Java) GitHub](https://github.com/gravity9-tech/mongo-cse)
+
+### Change Stream with aggregation
 In certain situations, you might not be interested in every change event happening in a collection. Instead, you may want to focus on specific changes. You can use an aggregation pipeline to filter these changes or to transform the change stream event documents. In example below we want to filter only event with balance greater than 1000.
 
 ```javascript
